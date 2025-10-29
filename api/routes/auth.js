@@ -3,8 +3,8 @@ import {  } from "../controllers/auth.js"
 
 const router = Express.Router();
 
-router.get("", (req, res)=>{
-    
-});
+router.post("register", register);
+router.post("login", login);
+router.post("logout",logout);
 
 export default router;
