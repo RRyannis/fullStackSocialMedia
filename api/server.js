@@ -8,6 +8,11 @@ import commentRoutes from "./routes/comments.js";
 import storyRoutes from "./routes/stories.js";
 import likeRoutes from "./routes/likes.js";
 import authRoutes from "./routes/auth.js";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 
 const app = express();
@@ -24,13 +29,13 @@ app.use(cors({
 app.use(cookieParser());
 
 const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, '../client/public/upload')
+  destination: (req, file, cb) => {
+    cb(null, path.join(__dirname, '../client/public/upload'))
   },
   filename: function (req, file, cb) {
     // const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
     // cb(null, file.fieldname + '-' + uniqueSuffix)
-    cb(null, Date.now() + file.originalName)
+    cb(null, Date.now() + file.originalname)
   }
 })
 
@@ -38,9 +43,11 @@ const upload = multer({ storage: storage })
 
 app.post("/api/upload", upload.single("file"), (req, res) => {
   const file = req.file;
+  if (!file) return res.status(400).json("No file uploaded");
   res.status(200).json(file.filename);
 });
 
+app.use("/upload", express.static(path.join(__dirname, "../client/public/upload")));
 
 app.use("/api/users", userRoutes);
 app.use("/api/posts", postRoutes);

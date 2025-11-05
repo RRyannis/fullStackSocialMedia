@@ -10,7 +10,7 @@ import { useQuery, useMutation, useQueryClient, QueryClient, QueryClientProvider
 const Share = () => {
 
   const [file, setFile] = useState(null);
-  const [desc, setDesc] = useState("null");
+  const [desc, setDesc] = useState("");
 
     const upload = async () => {
     try {
@@ -40,8 +40,13 @@ const Share = () => {
   const handleClick = async (e) => {
     e.preventDefault();
     let imgUrl = "";
-    if (file) imgUrl = await upload();
+    if (file) {
+      const filename = await upload();
+      imgUrl = `http://localhost:8800/upload/${filename}`;
+    }
     mutation.mutate({ desc, img: imgUrl });
+    setDesc("");
+    setFile(null);
   };
 
   return (
