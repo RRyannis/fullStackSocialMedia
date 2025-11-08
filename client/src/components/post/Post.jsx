@@ -58,3 +58,38 @@ const Post = ({ post }) => {
 };
 
 export default Post;
+
+
+
+
+const mutation = useMutation(
+    (liked) => {
+      if (liked) return makeRequest.delete("/likes?postId=" + post.id);
+      return makeRequest.post("/likes", { postId: post.id });
+    },
+    {
+      onSuccess: () => {
+        // Invalidate and refetch
+        queryClient.invalidateQueries(["likes"]);
+      },
+    }
+  );
+  const deleteMutation = useMutation(
+    (postId) => {
+      return makeRequest.delete("/posts/" + postId);
+    },
+    {
+      onSuccess: () => {
+        // Invalidate and refetch
+        queryClient.invalidateQueries(["posts"]);
+      },
+    }
+  );
+
+  const handleLike = () => {
+    mutation.mutate(data.includes(currentUser.id));
+  };
+
+  const handleDelete = () => {
+    deleteMutation.mutate(post.id);
+  };
