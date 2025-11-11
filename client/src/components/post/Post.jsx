@@ -8,12 +8,21 @@ import { Link } from "react-router-dom";
 import Comments from "../comments/Comments";
 import { useState } from "react";
 import moment from "moment";
+import { useQuery, useMutation, useQueryClient, QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { makeRequest } from "../../axios";
 
 const Post = ({ post }) => {
   const [commentOpen, setCommentOpen] = useState(false);
 
-  //TEMPORARY
-  const liked = false;
+  const { isLoading, error, data } = useQuery({
+    queryKey: ["likes", post.id],
+    queryFn: async () => {
+      const res = await makeRequest.get("/likes?postId=" + post.id);
+      return res.data;
+    }
+  });
+  console.log(data);
+  
 
   return (
     <div className="post">
@@ -39,8 +48,8 @@ const Post = ({ post }) => {
         </div>
         <div className="info">
           <div className="item">
-            {liked ? <FavoriteOutlinedIcon /> : <FavoriteBorderOutlinedIcon />}
-            12 Likes
+            {/* {liked ? <FavoriteOutlinedIcon style={{color: "blue"}}/> : <FavoriteBorderOutlinedIcon />} */}
+            {data?.length || 0} Likes
           </div>
           <div className="item" onClick={() => setCommentOpen(!commentOpen)}>
             <TextsmsOutlinedIcon />
@@ -62,34 +71,34 @@ export default Post;
 
 
 
-const mutation = useMutation(
-    (liked) => {
-      if (liked) return makeRequest.delete("/likes?postId=" + post.id);
-      return makeRequest.post("/likes", { postId: post.id });
-    },
-    {
-      onSuccess: () => {
-        // Invalidate and refetch
-        queryClient.invalidateQueries(["likes"]);
-      },
-    }
-  );
-  const deleteMutation = useMutation(
-    (postId) => {
-      return makeRequest.delete("/posts/" + postId);
-    },
-    {
-      onSuccess: () => {
-        // Invalidate and refetch
-        queryClient.invalidateQueries(["posts"]);
-      },
-    }
-  );
+// const mutation = useMutation(
+//     (liked) => {
+//       if (liked) return makeRequest.delete("/likes?postId=" + post.id);
+//       return makeRequest.post("/likes", { postId: post.id });
+//     },
+//     {
+//       onSuccess: () => {
+//         // Invalidate and refetch
+//         queryClient.invalidateQueries(["likes"]);
+//       },
+//     }
+//   );
+//   const deleteMutation = useMutation(
+//     (postId) => {
+//       return makeRequest.delete("/posts/" + postId);
+//     },
+//     {
+//       onSuccess: () => {
+//         // Invalidate and refetch
+//         queryClient.invalidateQueries(["posts"]);
+//       },
+//     }
+//   );
 
-  const handleLike = () => {
-    mutation.mutate(data.includes(currentUser.id));
-  };
+//   const handleLike = () => {
+//     mutation.mutate(data.includes(currentUser.id));
+//   };
 
-  const handleDelete = () => {
-    deleteMutation.mutate(post.id);
-  };
+//   const handleDelete = () => {
+//     deleteMutation.mutate(post.id);
+//   };
