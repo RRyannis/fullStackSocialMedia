@@ -8,19 +8,43 @@ import PlaceIcon from "@mui/icons-material/Place";
 import LanguageIcon from "@mui/icons-material/Language";
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import Posts from "../../components/posts/Posts"
+import Posts from "../../components/posts/Posts";
+import { useQuery, useMutation, useQueryClient, QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { makeRequest } from "../../axios";
+import { useState, useContext } from "react";
+import { useLocation } from "react-router-dom";
+import { AuthContext } from "../../context/authContext";
 
 const Profile = () => {
+
+  const {currentUser} = useContext(AuthContext)
+  const userId = parseInt(useLocation().pathname.split("/")[2]);
+
+  const { isLoading, error, data } = useQuery({
+      queryKey: ["user", userId],
+      queryFn: async () => {
+        const res = await makeRequest.get("/users/find/" + userId);
+        return res.data;
+      }
+  });
+
+  console.log(data);
+
+  // if (isLoading) return <div className="profile">Loading profile...</div>;
+  // if (error) return <div className="profile">Error loading profile 😢</div>;
+  // if (!data) return <div className="profile">No user data found.</div>;
+
+
   return (
     <div className="profile">
-      <div className="images">
+      { isLoading ? "loading" : <><div className="images">
         <img
-          src="https://images.pexels.com/photos/13440765/pexels-photo-13440765.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+          src={data.coverPic}
           alt=""
           className="cover"
         />
         <img
-          src="https://images.pexels.com/photos/14028501/pexels-photo-14028501.jpeg?auto=compress&cs=tinysrgb&w=1600&lazy=load"
+          src={data.profilePic}
           alt=""
           className="profilePic"
         />
@@ -45,18 +69,18 @@ const Profile = () => {
             </a>
           </div>
           <div className="center">
-            <span>Jane Doe</span>
+            <span>{data.name}</span>
             <div className="info">
               <div className="item">
                 <PlaceIcon />
-                <span>USA</span>
+                <span>{data.city}</span>
               </div>
               <div className="item">
                 <LanguageIcon />
-                <span>lama.dev</span>
+                <span>{data.website}</span>
               </div>
             </div>
-            <button>follow</button>
+            {userId === currentUser.id ? (<button>update</button>) : <button>follow</button>}
           </div>
           <div className="right">
             <EmailOutlinedIcon />
@@ -64,7 +88,7 @@ const Profile = () => {
           </div>
         </div>
       <Posts/>
-      </div>
+      </div></>}
     </div>
   );
 };
