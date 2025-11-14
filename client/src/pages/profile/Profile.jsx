@@ -30,9 +30,6 @@ const Profile = () => {
 
   console.log(data);
 
-  // if (isLoading) return <div className="profile">Loading profile...</div>;
-  // if (error) return <div className="profile">Error loading profile 😢</div>;
-  // if (!data) return <div className="profile">No user data found.</div>;
 
 
   return (
