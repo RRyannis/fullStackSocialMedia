@@ -24,6 +24,7 @@ const Post = ({ post }) => {
   });
  
   const {currentUser} = useContext(AuthContext)
+  
   const queryClient = useQueryClient();
 
   const mutation = useMutation({

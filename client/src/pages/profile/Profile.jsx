@@ -18,6 +18,7 @@ import { AuthContext } from "../../context/authContext";
 const Profile = () => {
 
   const {currentUser} = useContext(AuthContext)
+
   const userId = parseInt(useLocation().pathname.split("/")[2]);
 
   const { isLoading, error, data } = useQuery({
@@ -28,8 +29,31 @@ const Profile = () => {
       }
   });
 
-  console.log(data);
+   const { isLoading: rIsLoading, data: relationshipData } = useQuery({
+      queryKey: ["relationship"],
+      queryFn: async () => {
+        const res = await makeRequest.get("/relationships?followedUserId=" + userId);
+        return res.data;
+      }
+  });
 
+  console.log(relationshipData);
+
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation({
+    mutationFn: (following)=>{
+      if (following) return makeRequest.delete("/relationships?userId=" + userId);
+      return makeRequest.post("/relationships", { userId});
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(["relationship"])
+    },
+  })
+
+  const handleFollow = () => {
+      mutation.mutate(relationshipData.includes(currentUser.id));
+  }
 
 
   return (
@@ -77,14 +101,18 @@ const Profile = () => {
                 <span>{data.website}</span>
               </div>
             </div>
-            {userId === currentUser.id ? (<button>update</button>) : <button>follow</button>}
+            {rIsLoading ? "loading" : userId === currentUser.id ? 
+            (<button>update</button>) 
+            :
+             <button onClick={handleFollow}>{relationshipData.includes(currentUser.id) ? "following" : "follow "}</button>
+            }
           </div>
           <div className="right">
             <EmailOutlinedIcon />
             <MoreVertIcon />
           </div>
         </div>
-      <Posts/>
+      <Posts userId = {userId}/>
       </div></>}
     </div>
   );
