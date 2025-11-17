@@ -1,8 +1,10 @@
 import "./update.scss";
 
-const Update = () => {
+const Update = ({ setOpenUpdate }) => {
     return(
-        <div>Update</div>
+        <div className="update">Update
+            <button onClick={()=>setOpenUpdate(false)}>X</button>
+        </div>
     )
 };
 

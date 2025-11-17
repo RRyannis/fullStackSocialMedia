@@ -14,8 +14,11 @@ import { makeRequest } from "../../axios";
 import { useState, useContext } from "react";
 import { useLocation } from "react-router-dom";
 import { AuthContext } from "../../context/authContext";
+import Update from "../../components/update/Update";
 
 const Profile = () => {
+
+  const [openUpdate, setOpenUpdate] = useState(false);
 
   const {currentUser} = useContext(AuthContext)
 
@@ -102,7 +105,7 @@ const Profile = () => {
               </div>
             </div>
             {rIsLoading ? "loading" : userId === currentUser.id ? 
-            (<button>update</button>) 
+            (<button onClick={()=>{console.log("clicked update"); setOpenUpdate(true)}}>update</button>) 
             :
              <button onClick={handleFollow}>{relationshipData.includes(currentUser.id) ? "following" : "follow "}</button>
             }
@@ -114,6 +117,7 @@ const Profile = () => {
         </div>
       <Posts userId = {userId}/>
       </div></>}
+      {openUpdate && <Update setOpenUpdate={setOpenUpdate}/>}
     </div>
   );
 };
