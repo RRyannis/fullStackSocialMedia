@@ -3,7 +3,7 @@ import { useState, useContext } from "react";
 import { useQuery, useMutation, useQueryClient, QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { makeRequest } from "../../axios.js";
 
-const Update = ({ setOpenUpdate }) => {
+const Update = ({ setOpenUpdate, user }) => {
 
    
     const [ cover, setCover] = useState(null);
@@ -45,14 +45,17 @@ const Update = ({ setOpenUpdate }) => {
 
   const handleClick = async (e) => {
     e.preventDefault();
-    let imgUrl = "";
-    if (file) {
-      const filename = await upload();
-      imgUrl = `http://localhost:8800/upload/${filename}`;
-    }
-    mutation.mutate({ desc, img: imgUrl });
-    setDesc("");
-    setFile(null);
+    let coverUrl = user.coverPic;
+    let profileUrl = user.profilePic;
+
+    coverUrl = cover && await upload(cover);
+    profileUrl = profile && await upload(profile);
+    // if (file) {
+    //   const filename = await upload();
+    //   imgUrl = `http://localhost:8800/upload/${filename}`;
+    // }
+    mutation.mutate({...texts, coverPic: coverUrl, profilePic: profileUrl});
+    setOpenUpdate(false);
   };
 
 
