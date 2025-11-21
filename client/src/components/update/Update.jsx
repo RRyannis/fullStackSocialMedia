@@ -2,6 +2,7 @@ import "./update.scss";
 import { useState, useContext } from "react";
 import { useQuery, useMutation, useQueryClient, QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { makeRequest } from "../../axios.js";
+import { AuthContext } from "../../context/authContext";
 
 const Update = ({ setOpenUpdate, user }) => {
 
@@ -48,8 +49,8 @@ const Update = ({ setOpenUpdate, user }) => {
     let coverUrl = user.coverPic;
     let profileUrl = user.profilePic;
 
-    coverUrl = cover && await upload(cover);
-    profileUrl = profile && await upload(profile);
+    coverUrl = cover ? await upload(cover) : user.coverPic;
+    profileUrl = profile ? await upload(profile) : user.profilePic;
     // if (file) {
     //   const filename = await upload();
     //   imgUrl = `http://localhost:8800/upload/${filename}`;
